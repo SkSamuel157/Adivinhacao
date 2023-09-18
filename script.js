@@ -1,87 +1,41 @@
-// Gerar um número aleatório entre 1 e 100
-const randomNumber = Math.floor(Math.random() * 100) + 1;
+let numeroAleatorio = Math.floor(Math.random() * 100) + 1;
+//  armazena um número inteiro aleatório entre 1 e 100.
+let tentativas = 5;
+// Isso significa que o jogador terá 5 tentativas para adivinhar o número aleatório.
 
-// Inicializar contador de tentativas e vidas
-let attempts = 0;
-let lives = 5; // Defina o número inicial de vidas aqui
-const maxAttempts = 5;
+function verificarPalpite() {
+    const palpite = document.getElementById('palpite').valueAsNumber;
+    const resultado = document.getElementById('resultado');
+    // Isso obtém o valor que o usuário inseriu em um campo de entrada de texto com o ID 'palpite' e o converte em um número.
 
-// Array para armazenar tentativas anteriores
-const previousAttempts = [];
+    if (isNaN(palpite) || palpite < 1 || palpite > 100) {
+        alert("O número inserido deve ser entre 1 e 100!");
+        return;
+    }
+    // verifica se o palpite do usuário é um número válido entre 1 e 100.
 
-// Função para verificar adivinhação
-function checkGuess() {
-    const guess = parseInt(document.getElementById('guess').value);
-    const message = document.getElementById('message');
-    const attemptsMessage = document.getElementById('attempts');
-    const livesMessage = document.getElementById('lives');
+    tentativas--;
 
-    if (isNaN(guess) || guess < 1 || guess > 100) {
-        message.textContent = 'Por favor, digite um número válido entre 1 e 100.';
+    if (palpite === numeroAleatorio) {
+        resultado.innerHTML = "<span>Parabéns! Você acertou!</span>";
+        resultado.classList.add("vitoria");
+        document.getElementById('adivinhar').disabled = true;
+        // Se o palpite do usuário for igual ao número aleatório, isso significa que o jogador acertou. 
+
+
+    } else if (tentativas === 0) {
+        resultado.innerHTML = "<span>Você perdeu! O número era " + numeroAleatorio + "</span>";
+        resultado.classList.add("derrota");
+        document.getElementById('adivinhar').disabled = true;
+        // Se o jogador ficar sem tentativas (tentativas igual a 0), uma mensagem informando que o jogador perdeu é exibida, juntamente com o número correto
+
+
+    } else if (palpite > numeroAleatorio) {
+        resultado.innerHTML = "<span>O número é menor! Tentativas restantes: " + tentativas + "</span>";
     } else {
-        attempts++;
-        lives--;
-
-        previousAttempts.push(guess);
-
-        if (guess === randomNumber) {
-            message.textContent = `Parabéns! Você acertou em ${attempts} tentativas.`;
-            document.getElementById('check').setAttribute('disabled', 'true');
-            document.getElementById('restart').style.display = 'block';
-        } else if (guess < randomNumber) {
-            message.textContent = 'Tente um número maior.';
-        } else {
-            message.textContent = 'Tente um número menor.';
-        }
-
-        if (attempts === maxAttempts || lives === 0) {
-            if (lives === 0) {
-                message.textContent = `Você perdeu! Suas vidas acabaram. O número correto era ${randomNumber}.`;
-            } else {
-                message.textContent = `Você usou todas as suas ${maxAttempts} tentativas. O número correto era ${randomNumber}.`;
-            }
-            
-            document.getElementById('check').setAttribute('disabled', 'true');
-            document.getElementById('restart').style.display = 'block';
-        }
-        
-        attemptsMessage.textContent = `Tentativas restantes: ${maxAttempts - attempts}`;
-        livesMessage.textContent = `Vidas restantes: ${lives}`;
-        displayPreviousAttempts();
+        resultado.innerHTML = "<span>O número é maior! Tentativas restantes: " + tentativas + "</span>";
     }
+
+
+    // Se o palpite do jogador estiver errado, esta parte do código informará se o número correto é maior ou menor que o palpite e mostrará o número de tentativas restantes.
 }
-
-// Função para reiniciar o jogo
-function restartGame() {
-    document.getElementById('check').removeAttribute('disabled');
-    document.getElementById('restart').style.display = 'none';
-    document.getElementById('guess').value = '';
-    attempts = 0;
-    lives = 5; // Defina o número inicial de vidas aqui
-    previousAttempts.length = 0;
-    document.getElementById('message').textContent = '';
-    document.getElementById('attempts').textContent = `Tentativas restantes: ${maxAttempts}`;
-    document.getElementById('lives').textContent = `Vidas restantes: ${lives}`;
-    displayPreviousAttempts();
-}
-
-// Inserir elemento para exibir vidas
-const livesElement = document.createElement('p');
-livesElement.id = 'lives';
-livesElement.textContent = `Vidas restantes: ${lives}`;
-document.body.appendChild(livesElement);
-
-// Função para exibir tentativas anteriores
-function displayPreviousAttempts() {
-    const previousAttemptsList = document.getElementById('previous-attempts');
-    previousAttemptsList.innerHTML = '';
-
-    for (let i = 0; i < previousAttempts.length; i++) {
-        const listItem = document.createElement('li');
-        listItem.textContent = `Tentativa ${i + 1}: ${previousAttempts[i]}`;
-        previousAttemptsList.appendChild(listItem);
-    }
-}
-
-document.getElementById('check').addEventListener('click', checkGuess);
-document.getElementById('restart').addEventListener('click', restartGame);
